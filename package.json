@@ -3,6 +3,7 @@
   "description": "spa training",
   "version": "0.0.1",
   "devDependencies": {
+    "gulp": "^3.8.10",
     "gulp-jshint": "^1.9.0"
   }
 }
