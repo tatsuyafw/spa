@@ -58,7 +58,7 @@ spa.chat = (function() {
         px_per_em        : 0,
         slider_hidden_px : 0,
         slider_closed_px : 0,
-        slider_opened_px : 0,
+        slider_opened_px : 0
       },
       jqueryMap = {},
 
@@ -116,7 +116,7 @@ spa.chat = (function() {
   // 用例: spa.chat.setSliderPosition( 'closed' );
   // 目的: チャットスライダーが要求された状態になるようにする
   // 引数:
-  //   * position_type - enum('closed', 'opend', または 'hidden')
+  //   * position_type - enum('closed', 'opened', または 'hidden')
   //   * callback - アニメーションの最後のオプションのコールバック。
   // このコールバックは単一引数としてスライダー div を表す jQuery コレクションを受け取る。
   // 動作:

@@ -96,6 +96,7 @@ spa.shell = (function () {
     }
     // アンカーマップへ変更を統合終了
 
+
     // URI の更新開始。成功しなければ元に戻す。
     try {
       $.uriAnchor.setAnchor( anchor_map_revise );
@@ -149,7 +150,7 @@ spa.shell = (function () {
          || _s_chat_previous !== _s_chat_proposed ) {
       s_chat_proposed = anchor_map_proposed.chat;
       switch ( s_chat_proposed ) {
-       case 'open' :
+       case 'opened' :
         is_ok = spa.chat.setSliderPosition( 'opened' );
         break;
        case 'closed' :
