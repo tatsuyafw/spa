@@ -3,7 +3,7 @@
   * SPAのシェルモジュール
   */
 
-/*global $, spa */
+/*global $, spa, setTimeout */
 spa.shell = (function () {
   "use strict";
 
@@ -24,14 +24,16 @@ spa.shell = (function () {
       + '</div>'
       + '<div class="spa-shell-foot"></div>'
       + '<div class="spa-shell-modal"></div>',
+    resize_interval : 200
   },
       stateMap = {
-        anchor_map        : {},
+        $container  : undefined,
+        anchor_map  : {},
+        resize_idto : undefined
       },
       jqueryMap = {},
-
       copyAnchorMap    , setJqueryMap,
-      changeAnchorPart , onHashchange,
+      changeAnchorPart , onHashchange, onResize,
       setChatAnchor    , initModule;
   //----- モジュールスコープ変数終了 ------------
 
@@ -180,6 +182,19 @@ spa.shell = (function () {
   };
   // イベントハンドラ/onHashchange/終了
 
+  // イベントハンドラ/onResize/開始
+  onResize = function() {
+    if ( stateMap.resize_idto ) { return true; }
+
+    spa.chat.handleResize();
+    stateMap.resize_idto = setTimeout(
+      function() { stateMap.resize_idto = undefined; },
+      configMap.resize_interval
+    );
+
+    return true;
+  };
+  // イベントハンドラ/onResize/終了
   //--------- イベントハンドラ終了 --------------
 
 
@@ -240,6 +255,7 @@ spa.shell = (function () {
     // そうしないと、トリガーイベントを処理できる状態になっていない。
     // トリガーイベントはアンカーがロード状態と見なせることを保証するために使う。
     $(window)
+      .bind( 'resize', onResize )
       .bind( 'hashchange', onHashchange )
       .trigger( 'hashchange' );
   };
