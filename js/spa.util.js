@@ -9,14 +9,11 @@
  *
  */
 
-/* jshint         browser : true,
-   devel  : true, indent  : 2,     maxerr   : 50,
-   newcap : true, plusplus : true, strict   : true
-*/
-
 /*global $, spa */
 
 spa.util = (function() {
+  "use strict";
+
   var makeError, setConfigMap;
 
   // パブリックコンストラクタ/makeError/開始
