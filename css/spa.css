@@ -10,13 +10,13 @@
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
-h1,h2,h3,h4,h5,h6,p { margin-bottom: 10px; }
+h1,h2,h3,h4,h5,h6,p { margin-bottom: 6pt; }
 ol,ul,dl { list-style-position : inside; }
 /** リセット終了 */
 
 /** 標準セレクタ開始 */
 body {
-  font: 13px 'Trebuchet MS', Verdana, Helvetica, Arail, sans-serif;
+  font: 10px 'Trebuchet MS', Verdana, Helvetica, Arail, sans-serif;
   color            : #444;
   background-color : #888;
 }
@@ -32,18 +32,15 @@ strong {
 
 /** spa名前空間セレクタ開始 */
 #spa {
-  position : absolute;
-  top      : 8px;
-  left     : 8px;
-  bottom   : 8px;
-  right    : 8px;
-
-  min-height : 500px;
-  min-width  : 500px;
-  overflow : hidden;
-
-  background-color : #fff;
-  border-radius : 0 8px 0 8px;
+  position   : absolute;
+  top        : 0;
+  Left       : 0;
+  bottom     : 0;
+  right      : 0;
+  background : #fff;
+  min-height : 15em;
+  min-width  : 35em;
+  overflow   : hidden;
 }
 /** spa名前空間セレクタ終了 */
 

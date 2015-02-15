@@ -1,0 +1,10 @@
+{
+  "browser" : true,
+  "devel" : true,
+  "indent"  : 2,
+  "maxerr"  : 50,
+  "newcap" : true,
+  "plusplus" : true,
+  "strict" : true,
+  "laxbreak" : true
+}

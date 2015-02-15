@@ -2,17 +2,15 @@
   * spa.shell.js
   * SPAのシェルモジュール
   */
-/* jshint         browser : true,
-   devel  : true, indent  : 2,     maxerr   : 50,
-   newcap : true, plusplus : true, strict   : true
-*/
-/*global $, spa */
+
+/*global $, spa, setTimeout */
 spa.shell = (function () {
+  "use strict";
 
   //----- モジュールスコープ変数開始 -----
   var configMap = {
     anchor_schema_map : {
-      chat : { open : true, closed : true }
+      chat : { opened : true, closed : true }
     },
     main_html : String()
       + '<div class="spa-shell-head">'
@@ -25,100 +23,37 @@ spa.shell = (function () {
         + '<div class="spa-shell-main-content"></div>'
       + '</div>'
       + '<div class="spa-shell-foot"></div>'
-      + '<div class="spa-shell-chat"></div>'
       + '<div class="spa-shell-modal"></div>',
-    chat_extend_time     : 1000,
-    chat_retract_time    : 300,
-    chat_extend_height   : 450,
-    chat_retract_height  : 15,
-    chat_extended_title  : 'Click to retract',
-    chat_retracted_title : 'Click to extend'
+    resize_interval : 200
   },
       stateMap = {
-        $container        : null,
-        anchor_map        : {},
-        is_chat_retracted : true
+        $container  : undefined,
+        anchor_map  : {},
+        resize_idto : undefined
       },
       jqueryMap = {},
-
-      copyAnchorMap, setJqueryMap, toggleChat,
-      changeAnchroPart, onHashchange,
-      onClickChat, initModule;
+      copyAnchorMap    , setJqueryMap,
+      changeAnchorPart , onHashchange, onResize,
+      setChatAnchor    , initModule;
   //----- モジュールスコープ変数終了 ------------
+
   //-------- ユーティリティメソッド開始 ---------
   // 格納したアンカーマップのコピーを返す。オーバーヘッドを最小にする。
   copyAnchorMap = function() {
     return $.extend( true, {}, stateMap.anchor_map );
   };
   //--------- ユーティリティメソッド終了 --------
+
   //--------- DOMメソッド開始 -------------------
   // DOMメソッド/setjqueryMap/開始
   setJqueryMap = function() {
     var $container = stateMap.$container;
 
-    jqueryMap = {
-      $container : $container,
-      $chat : $container.find( '.spa-shell-chat' )
-    };
+    jqueryMap = { $container : $container };
   };
   // DOMメソッド/setjqueryMap/終了
-  // DOMメソッド/toggleChat/開始
-  // 目的: チャットスライダーの拡大や格納
-  // 引数:
-  //  * do_extend - true の場合、スライダーを拡大する。falseの場合は格納する。
-  //  * callback  - アニメーションの最後に実行するオプションの関数
-  // 設定:
-  //  * chat_extend_time, chat_retract_time
-  //  * chat_extend_height, chat_retract_height
-  // 戻り値: boolean
-  //  * true  - スライダーアニメーションが開始された
-  //  * false - スライダーアニメーションが開始されなかった
-  // 状態: stateMap.is_chat_retracted を設定する
-  //  * true - スライダーは格納されている
-  //  * false - スライダーは拡大されている
-  toggleChat = function( do_extend, callback ) {
-    var px_chat_ht = jqueryMap.$chat.height(),
-        is_open   = px_chat_ht === configMap.chat_extend_height,
-        is_closed = px_chat_ht === configMap.chat_retract_height,
-        is_sliding = ! is_open && ! is_closed;
 
-    // 競合状態を避ける
-    if ( is_sliding ) { return false; }
-
-    // チャットスライダーの拡大開始
-    if ( do_extend ) {
-      jqueryMap.$chat.animate(
-        { height: configMap.chat_extend_height },
-        configMap.chat_extend_time,
-        function() {
-          jqueryMap.$chat.attr(
-            'title', configMap.chat_extended_title
-          );
-          stateMap.is_chat_retracted = false;
-          if ( callback ) { callback( jqueryMap.$chat ); }
-        }
-      );
-      return true;
-    }
-    // チャットスライダーの拡大終了
-
-    // チャットスライダーの格納開始
-    jqueryMap.$chat.animate(
-      { height: configMap.chat_retract_height },
-      configMap.chat_retract_time,
-      function() {
-        jqueryMap.$chat.attr(
-          'title', configMap.chat_retracted_title
-        );
-        stateMap.is_chat_retracted = true;
-        if ( callback ) { callback( jqueryMap.$chat ); };
-      }
-    );
-    return true;
-    // チャットスライダーの格納終了
-  };
-  // DOMメソッド/toggleChat/終了
-  // DOMメソッド//changeAnchorPart/開始
+  // DOMメソッド/changeAnchorPart/開始
   // 目的: URI アンカー要素部分を変更する
   // 引数:
   //   * arg_map - 変更したい URI アンカー部分を表すマップ
@@ -134,7 +69,7 @@ spa.shell = (function () {
   //   * エンコーディングの独立値と従属値の区別を管理する。
   //   * uriAnchor を使って URI の変更を試みる。
   //   * 成功時には true, 失敗時には false を返す。
-  changeAnchroPart = function( arg_map ) {
+  changeAnchorPart = function( arg_map ) {
     var anchor_map_revise = copyAnchorMap(),
         bool_return = true,
         key_name, key_name_dep;
@@ -163,6 +98,7 @@ spa.shell = (function () {
     }
     // アンカーマップへ変更を統合終了
 
+
     // URI の更新開始。成功しなければ元に戻す。
     try {
       $.uriAnchor.setAnchor( anchor_map_revise );
@@ -176,7 +112,7 @@ spa.shell = (function () {
 
     return bool_return;
   };
-  // DOMメソッド//changeAnchorPart/終了
+  // DOMメソッド/changeAnchorPart/終了
   //--------- DOMメソッド終了 -------------------
   
 
@@ -190,14 +126,14 @@ spa.shell = (function () {
   // 動作   :
   //   * URI アンカー要素を解析する
   //   * 提示されたアプリケーション状態と現在の状態を比較する。
-  //   * 提示された状態が既存の状態と異なる場合のみ
-  //     アプリケーションを調整する
+  //   * 提示された状態が既存の状態と異なり、アンカースキーマで
+  //     許可されている場合のみアプリケーションを調整する
   //
   onHashchange = function ( event ) {
-    var anchor_map_previous = copyAnchorMap(),
+    var _s_chat_previous, _s_chat_proposed, s_chat_proposed,
         anchor_map_proposed,
-        _s_chat_previous, _s_chat_proposed,
-        s_chat_proposed;
+        is_ok = true,
+        anchor_map_previous = copyAnchorMap();
 
     // アンカーの解析を試みる
     try { anchor_map_proposed = $.uriAnchor.makeAnchorMap(); }
@@ -216,57 +152,110 @@ spa.shell = (function () {
          || _s_chat_previous !== _s_chat_proposed ) {
       s_chat_proposed = anchor_map_proposed.chat;
       switch ( s_chat_proposed ) {
-       case 'open' :
-        toggleChat( true );
+       case 'opened' :
+        is_ok = spa.chat.setSliderPosition( 'opened' );
         break;
        case 'closed' :
-        toggleChat( false );
+        is_ok = spa.chat.setSliderPosition( 'closed' );
         break;
       default :
-        toggleChat( false );
+        spa.chat.setSliderPosition( 'closed' );
         delete anchor_map_proposed.chat;
         $.uriAnchor.setAnchor( anchor_map_proposed, null, true );
       }
     }
-    // 変更されている場合のチャットコンポーネントの調整変更
+    // 変更されている場合のチャットコンポーネントの調整終了
+
+    // スライダーの変更が拒否された場合にアンカーを元に戻す処理を開始
+    if ( ! is_ok ) {
+      if ( anchor_map_previous ) {
+        $.uriAnchor.setAnchor( anchor_map_previous, null, true );
+        stateMap.anchor_map = anchor_map_previous;
+      } else {
+        delete anchor_map_proposed.chat;
+        $.uriAnchor.setAnchor( anchor_map_proposed, null, true );
+      }
+    }
+    // スライダーの変更が拒否された場合にアンカーを元に戻す処理を終了
 
     return false;
   };
   // イベントハンドラ/onHashchange/終了
 
-  // イベントハンドラ/onClickChat/開始
-  onClickChat = function( event ) {
-    changeAnchroPart({
-      chat: ( stateMap.is_chat_retracted ? 'open' : 'closed' )
-    });
-    return false;
+  // イベントハンドラ/onResize/開始
+  onResize = function() {
+    if ( stateMap.resize_idto ) { return true; }
+
+    spa.chat.handleResize();
+    stateMap.resize_idto = setTimeout(
+      function() { stateMap.resize_idto = undefined; },
+      configMap.resize_interval
+    );
+
+    return true;
   };
-  // イベントハンドラ/onClickChat/終了
+  // イベントハンドラ/onResize/終了
   //--------- イベントハンドラ終了 --------------
+
+
+  //--------- コールバック開始 ------------
+  // コールバックメソッド/setAnchor/開始
+  // 用例: setChatAnchor( 'closed' );
+  // 目的: アンカーチャットコンポーネントを変更する。
+  // 引数:
+  //   * position_type - 「closed」または「opened」
+  // 動作:
+  //   可能なら URI アンカーパラメータを「chat」を
+  //   要求値に変更する。
+  // 戻り値:
+  //   * true - 要求されたアンカー部分が更新された
+  //   * false - 要求されたアンカー部分が更新されなかった
+  // 例外発行: なし
+  //
+  setChatAnchor = function( position_type ) {
+    return changeAnchorPart( { chat : position_type } );
+  };
+  // コールバックメソッド/setAnchor/終了
+  //--------- コールバック終了 ------------
+
   //--------- パブリックメソッド開始 ------------
   // パブリックメソッド/initModule/開始
+  // 用例: spa.chat.initModule( $('#app_div_id') );
+  // 目的: ユーザに機能を提供するようにチャットに指示する
+  // 引数:
+  //    * $append_target (例: $('#app_div_id') );
+  //    1 つの DOM コンテナを表す jQuery コレクション
+  // 動作:
+  //    $container に UI シェルを含め、機能モジュールを構成して初期化する。
+  //    シェルは URI アンカーや Cookie の管理などのブラウザ全体に及ぶ問題を担当する。
+  // 戻り値  : なし
+  // 例外発行: なし
+  //
   initModule = function( $container ) {
     // HTML をロードし、jQuery コレクションをマッピングする
     stateMap.$container = $container;
     $container.html( configMap.main_html );
     setJqueryMap();
 
-    // チャットスライダーを初期化し、クリックハンドラをバインドする
-    stateMap.is_chat_retracted = true;
-    jqueryMap.$chat
-      .attr( 'title', configMap.chat_retracted_title )
-      .click( onClickChat );
-
     // 我々のスキーマを使うように uriAnchor を設定する
     $.uriAnchor.configModule({
       schema_map : configMap.anchor_schema_map
     });
-    
+
+    // 機能モジュールを構成して初期化する
+    spa.chat.configModule({
+      set_chat_anchor : setChatAnchor,
+      chat_model : spa.model.chat,
+      people_model : spa.model.people
+    });
+    spa.chat.initModule( jqueryMap.$container );
+
     // URI アンカー変更イベントを処理する。
     // これはすべての機能モジュールを設定して初期化した後に行う。
     // そうしないと、トリガーイベントを処理できる状態になっていない。
     // トリガーイベントはアンカーがロード状態と見なせることを保証するために使う。
     $(window)
+      .bind( 'resize', onResize )
       .bind( 'hashchange', onHashchange )
       .trigger( 'hashchange' );
   };
