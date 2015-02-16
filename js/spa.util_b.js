@@ -8,7 +8,7 @@
  */
 
 /*global $, spa, getComputedStyle */
-spa.fake = (function() {
+spa.util_b = (function() {
   "use strict";
   //---------------- モジュールスコープ変数開始 --------------
   var configMap = {
