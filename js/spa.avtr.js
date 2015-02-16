@@ -3,7 +3,7 @@
  * アバター機能モジュール
  */
 
-/*global $, spa, getComputedStyle */
+/*global $, spa */
 spa.avtr = (function() {
   "use strict";
   return {};
