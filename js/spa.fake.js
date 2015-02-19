@@ -3,10 +3,16 @@
  * フェイクモジュール
  */
 
-/*global $, spa */
+/*global $, spa, setTimeout */
 spa.fake = (function() {
   "use strict";
-  var getPeopleList;
+  var getPeopleList, fakeIdSerial, makeFakeId, mockSio;
+
+  fakeIdSerial = 5;
+
+  makeFakeId = function() {
+    return 'id_' + String( fakeIdSerial++ );
+  };
 
   getPeopleList = function() {
     return [
@@ -41,7 +47,39 @@ spa.fake = (function() {
     ];
   };
 
+    mockSio = (function() {
+    var on_sio, emit_sio, callback_map = {};
+
+    on_sio = function( msg_type, callback ) {
+      callback_map[ msg_type ] = callback;
+    };
+
+    emit_sio = function( msg_type, data ) {
+
+      // 3 秒間の遅延後に「userupdate」コールバックで
+      // 「adduser」イベントに応答する
+      //
+      if ( msg_type === 'adduser' && callback_map.userupdate ) {
+        setTimeout( function() {
+          callback_map.userupdate(
+            [{
+              _id     : makeFakeId(),
+              name    : data.name,
+              css_map : data.css_map
+            }]
+          );
+        }, 3000 );
+      }
+    };
+
+    return {
+      on: on_sio,
+      emit: emit_sio
+    };
+  }());
+
   return {
-    getPeopleList : getPeopleList
+    getPeopleList : getPeopleList,
+    mockSio       : mockSio
   };
 }());
