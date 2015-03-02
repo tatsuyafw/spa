@@ -27,7 +27,7 @@ spa.chat = (function() {
         + '</div>'
       + '</div>'
     + '</div>',
-      
+
     settable_map : {
       slider_open_time : true,
       slider_close_time  : true,
@@ -49,7 +49,7 @@ spa.chat = (function() {
     window_height_min_em : 20,
     slider_opened_title : 'Click to close',
     slider_closed_title : 'Click to open',
-    
+
     chat_model      : null,
     people_model    : null,
     set_chat_anchor : null
@@ -310,7 +310,7 @@ spa.chat = (function() {
     return true;
   };
   // パブリックメソッド/handleResize/終了
-  
+
   // パブリックメソッドを戻す
   return {
     setSliderPosition : setSliderPosition,

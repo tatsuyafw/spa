@@ -42,7 +42,7 @@ spa.util = (function() {
   //    * config_map   - 構成を適用するマップ
   // 戻り値  : true
   // 例外発行: 入力キーが許可されていない場合は例外を発行する
-  // 
+  //
   setConfigMap = function( arg_map ) {
     var input_map = arg_map.input_map,
         settable_map = arg_map.settable_map,
