@@ -284,6 +284,7 @@ spa.model = (function() {
 
     _leave_chat = function() {
       var sio = isFakeData ? spa.fake.mockSio : spa.data.getSio();
+      chatee = null;
       stateMap.is_connected = false;
       if ( sio ) { sio.emit( 'leavechat' ); }
     };
