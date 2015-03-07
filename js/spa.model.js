@@ -270,6 +270,7 @@ spa.model = (function() {
       _update_list( arg_list );
       $.gevent.publish( 'spa-listchange', [ arg_list ] );
     };
+
     _publish_updatechat = function( arg_list ) {
       var msg_map = arg_list[ 0 ];
 
@@ -322,7 +323,6 @@ spa.model = (function() {
         msg_text  : msg_text
       };
 
-
       // updatechat を発行したので、送信メッセージを表示できる
       _publish_updatechat( [ msg_map ] );
       sio.emit( 'updatechat', msg_map );
@@ -343,7 +343,7 @@ spa.model = (function() {
       $.gevent.publish('spa-setchatee',
                        { old_chatee : chatee, new_chatee: new_chatee });
       chatee = new_chatee;
-      return true
+      return true;
     };
 
     return {
