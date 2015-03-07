@@ -99,7 +99,7 @@ spa.fake = (function() {
 
 
     emit_mock_msg = function() {
-      setTimeout(function() {
+      setTimeout( function() {
         var user = spa.model.people.get_user();
         if ( callback_map.updatechat ) {
           callback_map.updatechat([{
