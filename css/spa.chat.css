@@ -153,7 +153,7 @@
   height     : 2em;
   left       : 0em;
   right      : 1em;
-  bottom     : thin solid #888;
+  border     : thin solid #888;
   background : #888;
 }
 
