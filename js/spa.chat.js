@@ -449,7 +449,7 @@ spa.chat = (function() {
     // ユーザ入力イベントをバインドする
     jqueryMap.$head.bind(     'utap',   onTapToggle );
     jqueryMap.$list_box.bind( 'utap',   onTapList );
-    jqueryMap.$send..bind(    'utap',   onSubmitMsg );
+    jqueryMap.$send.bind(    'utap',   onSubmitMsg );
     jqueryMap.$form.bind(     'submit', onSubmitMsg );
   };
   // パブリックメソッド/initModule/終了
