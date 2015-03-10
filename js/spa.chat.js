@@ -28,7 +28,7 @@ spa.chat = (function() {
             + '<div class="spa-chat-msg-in">'
               + '<form class="spa-chat-msg-form">'
                 + '<input type="text"/>'
-                + '<input type="submit style="display:none"/>'
+                + '<input type="submit" style="display:none"/>'
                 +  '<div class="spa-chat-msg-send">'
                   + 'send'
                 + '</div>'
