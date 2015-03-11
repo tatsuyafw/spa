@@ -25,9 +25,9 @@
   border-color : #080;
 }
 
-.spa-avtr-box.spa-is-drag {
-  cursor : move;
-  color : #fff;
+.spa-avtr-box.spa-x-is-drag {
+  cursor           : move;
+  color            : #fff;
   background-color : #000;
-  border-color : #800;
+  border-color     : #800;
 }
