@@ -35,7 +35,7 @@ spa.avtr = (function() {
 
   //---------------- ユーティリティメソッド開始 ---------------
   getRandRgb = function() {
-    var i, rgb_list = {};
+    var i, rgb_list = [];
     for ( i = 0; i < 3; i++ ) {
       rgb_list.push( Math.floor( Math.random() * 128 ) + 128 );
     }
@@ -91,7 +91,7 @@ spa.avtr = (function() {
     stateMap.drag_bg_color = $target.css('background-color');
 
     $target
-      .andClass('spa-x-is-drag')
+      .addClass('spa-x-is-drag')
       .css('background-color', '');
   };
 
@@ -155,7 +155,7 @@ spa.avtr = (function() {
     // ユーザがログアウトしていたら描画しない
     if ( user.get_is_anon() ) { return false; }
 
-    people_db.each(function( person, idx) {
+    people_db().each(function( person, idx) {
       var class_list;
       if ( person.get_is_anon() ) { return true; }
       class_list = [ 'spa-avtr-box' ];
@@ -171,7 +171,7 @@ spa.avtr = (function() {
         .addClass( class_list.join(' '))
         .css( person.css_map )
         .attr( 'data-id', String( person.id ) )
-        .prop( 'title', spa.util_b.encodeHthml( person.name ))
+        .prop( 'title', spa.util_b.encodeHtml( person.name ))
         .text( person.name )
         .appendTo( $nav );
     });
