@@ -27,7 +27,7 @@ spa.avtr = (function() {
       setJqueryMap,
       updateAvatar,
       onTapNav,      onHeldstarNav,
-      onHeldmoveNav, onHeldenNav,
+      onHeldmoveNav, onHeldendNav,
       onSetchatee,   onListchange,
       onLogout,
       configModule, initModule;
@@ -62,7 +62,7 @@ spa.avtr = (function() {
       person_id : person_id,
       css_map : css_map
     });
-  };  
+  };
   //---------------------- DOMメソッド終了 --------------------
 
   //------------------- イベントハンドラ開始 ------------------
@@ -108,7 +108,7 @@ spa.avtr = (function() {
     });
   };
 
-  onHeldenNav = function( event ) {
+  onHeldendNav = function( event ) {
     var $drag_target = stateMap.$drag_target;
     if ( ! $drag_target ) { return false; }
 
@@ -129,8 +129,110 @@ spa.avtr = (function() {
 
     // これを使ってナビゲーション領域のユーザのアバターを強調表示する。
     // new_chatee.name、old_chatee.nameなどを参照。
+    // old_chatee アバターから強調表示を削除する
+    if ( old_chatee ) {
+      $nav
+        .find( '.spa-avtr-box[data-id=' + old_chatee.cid + ']' )
+        .removeClass( 'spa-x-is-chatee' );
+    }
+
+    // new_chatee アバターに強調表示を追加する
+    if ( new_chatee ) {
+      $nav
+        .find( '.spa-avtr-box[data-id=' + new_chatee.cid + ']' )
+        .addClass( 'spa-x-is-chatee' );
+    }
+  };
+
+  onListchange = function() {
+    var $nav = $(this),
+        people_db = configMap.people_model.get_db(),
+        user      = configMap.people_model.get_user(),
+        chatee    = configMap.chat_model.get_chatee() || {},
+        $box;
+
+    $nav.empty();
+    // ユーザがログアウトしていたら描画しない
+    if ( user.get_is_anon() ) { return false; }
+
+    people_db.each(function( person, idx) {
+      var class_list;
+      if ( person.get_is_anon() ) { return true; }
+      class_list = [ 'spa-avtr-box' ];
+
+      if ( person.id === chatee.id ) {
+        class_list.push( 'spa-x-is-chatee' );
+      }
+      if ( person.get_is_user() ) {
+        class_list.push( 'spa-x-is-user' );
+      }
+
+      $box = $('<div/>')
+        .addClass( class_list.join(' '))
+        .css( person.css_map )
+        .attr( 'data-id', String( person.id ) )
+        .prop( 'title', spa.util_b.encodeHthml( person.name ))
+        .text( person.name )
+        .appendTo( $nav );
+    });
+  };
+
+  onLogout = function() {
+    jqueryMap.$container.empty();
   };
   //-------------------- イベントハンドラ終了 --------------------
-  
-  return {};
+
+  //------------------- パブリックメソッド開始 -------------------
+  // パブリックメソッド/configModule/開始
+  // 用例: spa.avtr.configModule({...});
+  // 目的: 初期化前にモジュール(ユーザセッション中に変更されるはずのない値)を設定する。
+  // 動作:
+  //   内部構成データ構造 (configMap) を指定の引数で更新する。その他の処理は行わない。
+  // 戻り値: なし
+  // 例外発行: 受け取れない引数または欠如した引数の JavaScript エラーオブジェクトとスタックトレース
+  //
+  configModule = function( input_map ) {
+    spa.util.setConfigMap({
+      input_map : input_map,
+      settable_map : configMap.settable_map,
+      config_map : configMap
+    });
+    return true;
+  };
+  // パブリックメソッド/configModule/終了
+
+  // パブリックメソッド/initModule/開始
+  // 用例: spa.avtr.initModule( $container );
+  // 目的: 機能を提供するようにモジュールに指示する
+  // 引数: $container - 使用するコンテナ
+  // 動作: チャットユーザにアバターインタフェースを提供する
+  // 戻り値: なし
+  // 例外発行: なし
+  //
+  initModule = function( $container ) {
+    setJqueryMap( $container );
+
+    // モデルグローバルイベントをバインドする
+    $.gevent.subscribe( $container, 'spa-setchatee', onSetchatee );
+    $.gevent.subscribe( $container, 'spa-listchange', onListchange );
+    $.gevent.subscribe( $container, 'spa-logout', onLogout );
+
+    // 処理をバインドする
+    $container
+      .bind( 'utap',       onTapNav )
+      .bind( 'uheldstart', onHeldstarNav )
+      .bind( 'uheldmove',  onHeldmoveNav )
+      .bind( 'uheldend',   onHeldendNav );
+
+    return true;
+  };
+  // パブリックメソッド/initModule/終了
+
+  // パブリックメソッドを返す
+  return {
+    configModule : configModule,
+    initModule   : initModule
+  };
+
+  //------------------- パブリックメソッド終了 ---------------------
 }());
